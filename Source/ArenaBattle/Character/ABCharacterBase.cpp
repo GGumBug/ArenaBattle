@@ -9,6 +9,8 @@
 #include "ABComboActionData.h"
 #include "Physics/ABCollision.h"
 #include "Engine/DamageEvents.h"
+#include "CharacterStat/ABCharacterStatComponent.h"
+#include "Components/WidgetComponent.h"
 
 // Sets default values
 AABCharacterBase::AABCharacterBase()
@@ -68,6 +70,22 @@ AABCharacterBase::AABCharacterBase()
 	if (DeadMontageRef.Object)
 	{
 		DeadMontage = DeadMontageRef.Object;
+	}
+
+	// Stat Component 
+	Stat = CreateDefaultSubobject<UABCharacterStatComponent>(TEXT("Stat"));
+
+	// Widget Component 
+	HpBar = CreateDefaultSubobject<UWidgetComponent>(TEXT("Widget"));
+	HpBar->SetupAttachment(GetMesh());
+	HpBar->SetRelativeLocation(FVector(0.0f, 0.0f, 180.0f));
+	static ConstructorHelpers::FClassFinder<UUserWidget> HpBarWidgetRef(TEXT("/Game/ArenaBattle/UI/WBP_HpBar.WBP_HpBar_C"));
+	if (HpBarWidgetRef.Class)
+	{
+		HpBar->SetWidgetClass(HpBarWidgetRef.Class); // 위젯 클래스 설정
+		HpBar->SetWidgetSpace(EWidgetSpace::Screen); // 위젯 형태를 2D 로 전환
+		HpBar->SetDrawSize(FVector2D(150.0f, 15.0f)); // Canvas의 크기를 여기서 지정
+		HpBar->SetCollisionEnabled(ECollisionEnabled::NoCollision); // 충돌 처리 제거
 	}
 }
 
