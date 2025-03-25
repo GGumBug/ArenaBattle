@@ -25,6 +25,9 @@ protected:
 	UPROPERTY(VisibleAnywhere, Category = Effect)
 	TObjectPtr<class UParticleSystemComponent> Effect;
 
+	UPROPERTY(EditAnywhere, Category = Item)
+	TObjectPtr<class UABItemData> Item;
+
 	// 블루프린트에서도 사용이 가능하게 다이나믹 선언이 되어있어서
 	// UFUNCTION() 필수로 선언
 	UFUNCTION()

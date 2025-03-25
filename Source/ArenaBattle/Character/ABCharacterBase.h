@@ -6,7 +6,10 @@
 #include "GameFramework/Character.h"
 #include "Interface/ABAnimationAttackInterface.h"
 #include "Interface/ABCharacterWidgetInterface.h"
+#include "Interface/ABCharacterItemInterface.h"
 #include "ABCharacterBase.generated.h"
+
+DECLARE_LOG_CATEGORY_EXTERN(LogABCharacter, Log, All);
 
 UENUM()
 enum class ECharacterControlType : uint8
@@ -15,8 +18,28 @@ enum class ECharacterControlType : uint8
 	Quater
 };
 
+DECLARE_DELEGATE_OneParam(FOnTakeItemDelegate, class UABItemData* /*InItemData*/);
+//델리게이트를 배열로 관리할 수 없으니 구조체를 만들어서 배열로 관리하기 위해 만듦
+USTRUCT(BlueprintType)
+struct FTakeItemDelegateWrapper
+{
+	GENERATED_BODY()
+
+	FTakeItemDelegateWrapper() 
+	{
+
+	}
+
+	FTakeItemDelegateWrapper(const FOnTakeItemDelegate& InItemDelegate) : ItemDelegate(InItemDelegate) 
+	{
+
+	}
+
+	FOnTakeItemDelegate ItemDelegate;
+};
+
 UCLASS()
-class ARENABATTLE_API AABCharacterBase : public ACharacter, public IABAnimationAttackInterface, public IABCharacterWidgetInterface
+class ARENABATTLE_API AABCharacterBase : public ACharacter, public IABAnimationAttackInterface, public IABCharacterWidgetInterface, public IABCharacterItemInterface
 {
 	GENERATED_BODY()
 
@@ -79,4 +102,15 @@ protected:
 	TObjectPtr<class UWidgetComponent> HpBar;
 
 	virtual void SetupCharacterWidget(class UABUserWidget* InUserWidget) override;
+
+	// Item Section
+protected:
+	virtual void TakeItem(class UABItemData* InItemData) override;
+
+	UPROPERTY()
+	TArray<FTakeItemDelegateWrapper> TakeItemActions;
+
+	virtual void DrinkPotion(class UABItemData* InItemData);
+	virtual void EquipWeapon(class UABItemData* InItemData);
+	virtual void ReadScroll(class UABItemData* InItemData);
 };

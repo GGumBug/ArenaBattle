@@ -6,6 +6,7 @@
 #include "Components/StaticMeshComponent.h"
 #include "Particles/ParticleSystemComponent.h"
 #include "Physics/ABCollision.h"
+#include "Interface/ABCharacterItemInterface.h"
 
 // Sets default values
 AABItemBox::AABItemBox()
@@ -40,6 +41,18 @@ AABItemBox::AABItemBox()
 
 void AABItemBox::OnOverlapBegin(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepHitResult)
 {
+	if (nullptr == Item)
+	{
+		Destroy();
+		return;
+	}
+
+	IABCharacterItemInterface* OverlappingPawn = Cast<IABCharacterItemInterface>(OtherActor);
+	if (OverlappingPawn)
+	{
+		OverlappingPawn->TakeItem(Item);
+	}
+
 	Effect->Activate(true); // 파티클 재생
 	Mesh->SetHiddenInGame(true); // 메쉬 숨기기
 	SetActorEnableCollision(false); // 콜리젼 비활성화
