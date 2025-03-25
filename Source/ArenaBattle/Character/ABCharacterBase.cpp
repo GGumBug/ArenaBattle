@@ -96,6 +96,12 @@ AABCharacterBase::AABCharacterBase()
 	TakeItemActions.Add(FTakeItemDelegateWrapper(FOnTakeItemDelegate::CreateUObject(this, &AABCharacterBase::EquipWeapon)));
 	TakeItemActions.Add(FTakeItemDelegateWrapper(FOnTakeItemDelegate::CreateUObject(this, &AABCharacterBase::DrinkPotion)));
 	TakeItemActions.Add(FTakeItemDelegateWrapper(FOnTakeItemDelegate::CreateUObject(this, &AABCharacterBase::ReadScroll)));
+
+	// Weapon Component
+	// 무기가 손을 따라 다녀야 되기 때문에 소켓에 등록
+	// 인피니티 블레이드 Mesh에 있는 소켓을 참조 한 것이다.
+	Weapon = CreateDefaultSubobject<USkeletalMeshComponent>(TEXT("Weapon"));
+	Weapon->SetupAttachment(GetMesh(), TEXT("hand_rSocket"));
 }
 
 void AABCharacterBase::PostInitializeComponents()
@@ -276,7 +282,18 @@ void AABCharacterBase::DrinkPotion(UABItemData* InItemData)
 
 void AABCharacterBase::EquipWeapon(UABItemData* InItemData)
 {
-	UE_LOG(LogABCharacter, Log, TEXT("Equip Weapon"));
+	UABWeaponItemData* WeaponItemData = Cast<UABWeaponItemData>(InItemData);
+	if (WeaponItemData)
+	{
+		// TSoftObjectPtr가 로드되어 있지 않다면
+		if (WeaponItemData->WeaponMesh.IsPending())
+		{
+			// 로드
+			WeaponItemData->WeaponMesh.LoadSynchronous();
+		}
+
+		Weapon->SetSkeletalMesh(WeaponItemData->WeaponMesh.Get());
+	}
 }
 
 void AABCharacterBase::ReadScroll(UABItemData* InItemData)
