@@ -8,8 +8,8 @@
 UABCharacterStatComponent::UABCharacterStatComponent()
 {
 	CurrentLevel = 1;
+	AttackRadius = 50.0f;
 }
-
 
 // Called when the game starts
 void UABCharacterStatComponent::BeginPlay()
