@@ -69,7 +69,24 @@ void AABCharacterPlayer::BeginPlay()
 {
 	Super::BeginPlay();
 
+	APlayerController* PlayerController = Cast<APlayerController>(GetController());
+	if (PlayerController)
+	{
+		EnableInput(PlayerController); // 입력 키는 함수
+	}
+
 	ChangeCharacterControl();
+}
+
+void AABCharacterPlayer::SetDead()
+{
+	Super::SetDead();
+
+	APlayerController* PlayerController = Cast<APlayerController>(GetController());
+	if (PlayerController)
+	{
+		DisableInput(PlayerController); // 입력 끄는 함수
+	}
 }
 
 void AABCharacterPlayer::ChangeCharacterControl()
